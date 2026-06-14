@@ -1,75 +1,65 @@
 # Game Assistant Pro
 
-Tool **Windows Desktop** (C# / .NET 8 / **WPF**, kiến trúc **MVVM**) làm bảng cấu hình
-cho công cụ hỗ trợ game. Bản hiện tại (milestone 1) tập trung vào **toàn bộ giao diện**
-và **lưu / đọc cấu hình JSON** — chưa nối engine auto vào game.
+Tool **Windows Desktop** (C# / .NET 8 / **WPF**, kiến trúc **MVVM**) cho công cụ hỗ trợ game.
+Gồm **giao diện cấu hình đầy đủ**, **lưu/đọc cấu hình JSON (mật khẩu mã hóa DPAPI)** và
+**khung engine đa luồng** chạy được end‑to‑end bằng client mô phỏng.
 
-> ⚠️ WPF chỉ build & chạy được trên **Windows**. Không build được trên Linux/macOS.
+> ⚠️ WPF chỉ build & chạy trên **Windows**. Engine hiện dùng `SimulatedGameClient` (mô phỏng).
+> Phần kết nối game thật là một lớp `IGameClient` do bạn ghép vào — repo **không** chứa giao thức server.
 
 ---
 
 ## 1. Yêu cầu
-
 - Windows 10/11
-- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) (hoặc Visual Studio 2022 17.8+ với workload *.NET Desktop Development*)
+- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) hoặc Visual Studio 2022 (workload *.NET Desktop Development*)
 
 ## 2. Build & chạy
-
-**Bằng dòng lệnh:**
-
 ```bat
 dotnet build GameAssistantPro.sln -c Release
 dotnet run --project GameAssistantPro/GameAssistantPro.csproj
 ```
-
-**Bằng Visual Studio:** mở `GameAssistantPro.sln`, đặt `GameAssistantPro` làm startup project, nhấn **F5**.
+Hoặc mở `GameAssistantPro.sln` bằng Visual Studio → F5.
 
 ## 3. Cấu trúc dự án (MVVM)
-
 ```
 GameAssistantPro/
-├── App.xaml(.cs)            # Khởi động + theme tối, converters dùng chung
-├── Core/                    # Lớp nền không phụ thuộc thư viện ngoài
-│   ├── ObservableObject.cs  # INotifyPropertyChanged (SetProperty)
-│   ├── RelayCommand.cs      # ICommand cho MVVM
-│   └── Converters.cs        # EnumBoolean / InverseBoolean / BoolToVisibility
-├── Models/                  # Toàn bộ cấu hình (serialize JSON)
-│   ├── AppConfig.cs         # Gốc: Accounts + Launch + Trade + Train + Function
-│   ├── AccountConfig.cs     # Tài khoản (user/pass/server/proxy)
-│   ├── LaunchSettings.cs    # Kích thước + độ trễ mở game
-│   ├── TradeConfig.cs       # Tab Giao dịch (+ TradeMapEntry, TradeSet)
-│   ├── TrainConfig.cs       # Tab Train (+ Monster/Pickup/Avoid/AddStats)
-│   ├── FunctionConfig.cs    # Tab Chức năng (+ GoldTicket, Buff)
-│   ├── Common.cs / Enums.cs # IdEntry, NameEntry + các enum
-├── Services/
-│   ├── IConfigService.cs
-│   └── JsonConfigService.cs # Lưu/đọc config.json (tự sao lưu file hỏng)
-├── ViewModels/              # MainViewModel + VM cho từng tab
-└── Views/                   # MainWindow + AccountView/TradeView/TrainView/FunctionView
+├── App.xaml(.cs)            # Khởi động + theme tối, converters
+├── Core/                    # Nền tảng: ObservableObject, RelayCommand, Converters, CryptoHelper (DPAPI)
+├── Models/                  # AppConfig + Account/Launch/Trade/Train/Function (+ nested) — serialize JSON
+├── Services/                # IConfigService, JsonConfigService (config.json)
+├── Engine/                  # ⭐ Khung auto đa luồng
+│   ├── IGameClient.cs       #   ĐIỂM CẮM giao thức game thật
+│   ├── SimulatedGameClient.cs#  Client mô phỏng (log theo cấu hình, tăng SM giả lập)
+│   ├── BotContext.cs        #   Account + Config + hàm log
+│   ├── BotRunner.cs         #   1 luồng/tài khoản: connect → login → vòng lặp (trade/attack/pickup/functions)
+│   ├── BotManager.cs        #   Quản lý nhiều runner, gom log, sự kiện AllStopped
+│   ├── ScheduleHelper.cs    #   Khung giờ ON
+│   └── BotStatus.cs
+├── ViewModels/              # Main + per-tab VM
+└── Views/                   # MainWindow + 5 tab (Tài khoản, Giao dịch, Train, Chức năng, Nhật ký)
 ```
 
-Luồng dữ liệu: `Views` (XAML) ⇄ binding ⇄ `ViewModels` ⇄ `Models` (`AppConfig`) ⇄ `JsonConfigService` ⇄ `config.json`.
+## 4. Tính năng
+- **4 tab cấu hình** đầy đủ theo spec: Tài khoản · Giao dịch · Train · Chức năng (vé vàng/NRJ, mua bùa…).
+- **Tab Nhật ký:** bảng trạng thái từng tài khoản (Đang chạy/Đã dừng/Lỗi + SM) và **log realtime**.
+- **Engine đa luồng:** mỗi tài khoản 1 luồng nền, dừng bằng `CancellationToken`, tôn trọng **giờ ON**,
+  **thoát khi đủ SM**. Nút **Bắt đầu/Dừng** đã nối thật.
+- **Lưu/đọc `config.json`**; **mật khẩu mã hóa DPAPI** (theo user Windows hiện tại), tương thích ngược file cũ.
 
-## 4. Tính năng đã có
+## 5. Ghép game thật (việc còn lại)
+Engine đang chạy với `SimulatedGameClient`. Để auto game thật:
+1. Viết lớp `RealGameClient : IGameClient` — cài đặt `ConnectAsync/LoginAsync/Trade/Attack/Pickup/Functions/GetPower`
+   bằng giao thức mạng của game (socket, packet…). Đọc cấu hình qua `ctx.Config`, báo tiến trình qua `ctx.Log(...)`.
+2. Trong `ViewModels/MainViewModel.cs`, đổi factory:
+   ```csharp
+   _manager = new BotManager(() => new RealGameClient());
+   ```
+Không cần sửa UI hay model — toàn bộ binding/log/trạng thái dùng lại được ngay.
 
-- **Tab Tài khoản:** danh sách tài khoản (thêm/sửa/xóa), user/pass/server, máy chủ ủy quyền (proxy),
-  ô captcha, kích thước & độ trễ mở game, nút **Save config**.
-- **Tab Giao dịch:** kích hoạt bản đồ giao dịch, chọn tài khoản/Map/Khu, bảng `STT · ID map · ID normal`,
-  nhập theo **Set** (ID đồ sao / ID đồ thường) + thêm/cập nhật/xóa set.
-- **Tab Train:** đánh quái (Map/Khu, cơ chế đánh dấu, loại quái, lọc quái, giới hạn HP %, FPS, d/s quái, d/s kỹ năng);
-  nhặt/xử lý đồ (cơ chế nhặt, d/s nhặt, d/s vứt, Auto Vứt/Default); né người/boss (d/s tên, d/s khu); cộng chỉ số (HP/MP/SD).
-- **Tab Chức năng:** chức năng chung (thoát khi đủ SM, về nhà KI, các delay, Use Item/GLT/Default, mua khẩu trang/cỏ 4 lá,
-  tách-hợp nhất/đi theo, auto xin đậu, thời gian ON…); vé vàng/NRJ (map 155/166, E10, mua khi vàng ≥ ngưỡng);
-  mua bùa (thời hạn 1h/8h/1 tháng, chế độ, bảng 9 loại bùa + số lượng).
-- **Lưu/đọc cấu hình:** `config.json` cạnh file thực thi; nút **Lưu cấu hình** / **Tải lại** trên thanh công cụ.
+## 6. Giới hạn / lưu ý
+- Repo **không** chứa và **không** reverse‑engineer giao thức server. Phần đó bạn tự cung cấp.
+- Mật khẩu mã hóa bằng DPAPI **theo máy + user Windows** → copy `config.json` sang máy/người dùng khác sẽ cần nhập lại.
+- Chưa build kiểm thử trên Windows trong môi trường tạo code (Linux) — hãy chạy `dotnet build` để xác nhận.
 
-## 5. Giới hạn của bản này
-
-- **Chưa có engine auto** kết nối game — nút *Bắt đầu/Dừng* hiện chỉ là demo UI. Phần logic/giao thức game sẽ
-  được ghép ở milestone sau (kiến trúc đã tách `Services`/VM để dễ cắm vào).
-- **Mật khẩu lưu dạng plaintext** trong `config.json` (tool nội bộ). Cân nhắc mã hóa (DPAPI) nếu cần.
-
-## 6. Hướng phát triển tiếp
-
-- Định nghĩa `IBotEngine` + runner đa luồng cho từng tài khoản.
-- Mã hóa mật khẩu, import/export cấu hình, log realtime, hiển thị trạng thái từng tài khoản.
+## 7. Hướng phát triển tiếp
+- `RealGameClient` theo protocol thật; import/export cấu hình; lọc log theo tài khoản; Start/Stop từng tài khoản riêng.

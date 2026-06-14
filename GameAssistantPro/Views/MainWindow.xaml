@@ -58,6 +58,36 @@
             <TabItem Header="Chức năng">
                 <views:FunctionView DataContext="{Binding Function}"/>
             </TabItem>
+            <TabItem Header="Nhật ký">
+                <Grid Margin="6">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <GroupBox Header="Trạng thái tài khoản" Grid.Row="0">
+                        <DataGrid ItemsSource="{Binding Runners}" Height="150" IsReadOnly="True">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Tài khoản" Binding="{Binding Account.Username}" Width="*"/>
+                                <DataGridTextColumn Header="Trạng thái" Binding="{Binding StatusText}" Width="160"/>
+                                <DataGridTextColumn Header="SM" Binding="{Binding Account.RuntimePower, StringFormat=N0}" Width="180"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </GroupBox>
+
+                    <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="6,4">
+                        <TextBlock Text="Nhật ký hoạt động" Foreground="{StaticResource AccentTextBrush}" FontWeight="SemiBold"/>
+                        <Button Content="🧹  Xóa log" Margin="16,0,0,0" Command="{Binding ClearLogsCommand}"
+                                Background="{StaticResource HeaderBackground}"/>
+                    </StackPanel>
+
+                    <ListBox Grid.Row="2" ItemsSource="{Binding Logs}" Margin="6"
+                             Background="{StaticResource InputBackground}" Foreground="{StaticResource TextBrush}"
+                             BorderBrush="{StaticResource LineBrush}" BorderThickness="1"
+                             FontFamily="Consolas" FontSize="12"/>
+                </Grid>
+            </TabItem>
         </TabControl>
 
     </DockPanel>

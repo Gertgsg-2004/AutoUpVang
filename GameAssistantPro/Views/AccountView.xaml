@@ -21,7 +21,8 @@
                                                 Binding="{Binding Enabled, UpdateSourceTrigger=PropertyChanged}"
                                                 Width="46"/>
                         <DataGridTextColumn Header="Tên đăng nhập" Binding="{Binding Username}" Width="*"/>
-                        <DataGridTextColumn Header="Server" Binding="{Binding Server}" Width="90"/>
+                        <DataGridTextColumn Header="Server" Binding="{Binding Server}" Width="70"/>
+                        <DataGridTextColumn Header="Trạng thái" Binding="{Binding RuntimeStatus}" Width="100" IsReadOnly="True"/>
                     </DataGrid.Columns>
                 </DataGrid>
             </DockPanel>

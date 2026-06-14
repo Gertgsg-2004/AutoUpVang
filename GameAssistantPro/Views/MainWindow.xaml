@@ -22,8 +22,8 @@
                                VerticalAlignment="Bottom"/>
                 </StackPanel>
                 <StackPanel Grid.Column="1" Orientation="Horizontal">
-                    <Button Content="▶  Bắt đầu" Command="{Binding StartCommand}"/>
-                    <Button Content="⏹  Dừng" Command="{Binding StopCommand}"/>
+                    <Button Content="▶  Chạy tất cả" Command="{Binding StartAllCommand}"/>
+                    <Button Content="⏹  Dừng tất cả" Command="{Binding StopAllCommand}"/>
                     <Button Content="💾  Lưu cấu hình" Command="{Binding SaveConfigCommand}"/>
                     <Button Content="↻  Tải lại" Command="{Binding ReloadConfigCommand}"
                             Background="{StaticResource HeaderBackground}"/>
@@ -70,8 +70,23 @@
                         <DataGrid ItemsSource="{Binding Runners}" Height="150" IsReadOnly="True">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Tài khoản" Binding="{Binding Account.Username}" Width="*"/>
-                                <DataGridTextColumn Header="Trạng thái" Binding="{Binding StatusText}" Width="160"/>
-                                <DataGridTextColumn Header="SM" Binding="{Binding Account.RuntimePower, StringFormat=N0}" Width="180"/>
+                                <DataGridTextColumn Header="Trạng thái" Binding="{Binding StatusText}" Width="140"/>
+                                <DataGridTextColumn Header="SM" Binding="{Binding Account.RuntimePower, StringFormat=N0}" Width="160"/>
+                                <DataGridTemplateColumn Header="Điều khiển" Width="170">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Button Content="▶" ToolTip="Chạy tài khoản này" Padding="10,2" Margin="2"
+                                                        Command="{Binding DataContext.StartAccountCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                        CommandParameter="{Binding Account}"/>
+                                                <Button Content="⏹" ToolTip="Dừng tài khoản này" Padding="10,2" Margin="2"
+                                                        Background="{StaticResource HeaderBackground}"
+                                                        Command="{Binding DataContext.StopAccountCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                        CommandParameter="{Binding Account}"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
                             </DataGrid.Columns>
                         </DataGrid>
                     </GroupBox>

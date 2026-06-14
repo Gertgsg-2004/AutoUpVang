@@ -40,17 +40,23 @@ public class MainViewModel : ObservableObject
     public string ConfigPath => _configService.ConfigPath;
     public string StatusMessage { get => _statusMessage; private set => SetProperty(ref _statusMessage, value); }
 
+    /// <summary>Có ít nhất một tài khoản đang chạy.</summary>
     public bool IsRunning
     {
         get => _isRunning;
         private set { if (SetProperty(ref _isRunning, value)) CommandManager.InvalidateRequerySuggested(); }
     }
 
+    // Lệnh tổng
     public ICommand SaveConfigCommand { get; }
     public ICommand ReloadConfigCommand { get; }
-    public ICommand StartCommand { get; }
-    public ICommand StopCommand { get; }
+    public ICommand StartAllCommand { get; }
+    public ICommand StopAllCommand { get; }
     public ICommand ClearLogsCommand { get; }
+
+    // Lệnh theo từng tài khoản
+    public ICommand StartAccountCommand { get; }
+    public ICommand StopAccountCommand { get; }
 
     public MainViewModel() : this(new JsonConfigService()) { }
 
@@ -59,17 +65,20 @@ public class MainViewModel : ObservableObject
         _configService = configService;
 
         // === ĐIỂM CẮM GAME THẬT ===
-        // Đổi "() => new SimulatedGameClient()" thành factory tạo client thật của bạn
-        // (lớp triển khai IGameClient có kết nối socket / gửi nhận packet).
+        // Đổi "() => new SimulatedGameClient()" thành factory tạo client thật của bạn.
         _manager = new BotManager(() => new SimulatedGameClient());
         _manager.Log += OnRunnerLog;
-        _manager.AllStopped += OnAllStopped;
+        _manager.StateChanged += OnEngineStateChanged;
 
         SaveConfigCommand = new RelayCommand(SaveConfig);
         ReloadConfigCommand = new RelayCommand(LoadConfig, () => !IsRunning);
-        StartCommand = new RelayCommand(Start, () => !IsRunning && _config.Accounts.Any(a => a.Enabled));
-        StopCommand = new RelayCommand(Stop, () => IsRunning);
+        StartAllCommand = new RelayCommand(StartAll,
+            () => _config.Accounts.Any(a => a.Enabled && !_manager.IsActive(a)));
+        StopAllCommand = new RelayCommand(StopAll, () => _manager.AnyRunning);
         ClearLogsCommand = new RelayCommand(() => Logs.Clear());
+
+        StartAccountCommand = new RelayCommand<AccountConfig>(StartAccount, CanStartAccount);
+        StopAccountCommand = new RelayCommand<AccountConfig>(StopAccount, CanStopAccount);
 
         LoadConfig();
     }
@@ -97,26 +106,43 @@ public class MainViewModel : ObservableObject
         }
     }
 
-    private void Start()
+    private void StartAll()
     {
-        Logs.Clear();
         _manager.StartAll(_config);
-        IsRunning = _manager.AnyRunning;
-        int count = Runners.Count(r => r.IsActive);
-        StatusMessage = count > 0 ? $"Đang chạy {count} tài khoản..." : "Không có tài khoản nào được bật.";
+        StatusMessage = $"Đang chạy {Runners.Count(r => r.IsActive)} tài khoản...";
     }
 
-    private void Stop()
+    private void StopAll()
     {
         _manager.StopAll();
         StatusMessage = "Đã gửi yêu cầu dừng tất cả tài khoản.";
     }
 
-    private void OnAllStopped()
+    private void StartAccount(AccountConfig? account)
+    {
+        if (account is null) return;
+        _manager.Start(account, _config);
+        StatusMessage = $"Đang chạy '{account.DisplayName}'...";
+    }
+
+    private void StopAccount(AccountConfig? account)
+    {
+        if (account is null) return;
+        _manager.Stop(account);
+        StatusMessage = $"Đã yêu cầu dừng '{account.DisplayName}'.";
+    }
+
+    private bool CanStartAccount(AccountConfig? account)
+        => account is not null && !_manager.IsActive(account);
+
+    private bool CanStopAccount(AccountConfig? account)
+        => account is not null && _manager.IsActive(account);
+
+    private void OnEngineStateChanged()
         => Dispatch(() =>
         {
-            IsRunning = false;
-            StatusMessage = "Tất cả tài khoản đã dừng.";
+            IsRunning = _manager.AnyRunning;
+            CommandManager.InvalidateRequerySuggested();
         });
 
     private void OnRunnerLog(BotRunner runner, string message)

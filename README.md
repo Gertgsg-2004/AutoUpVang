@@ -43,7 +43,7 @@ GameAssistantPro/
 - **4 tab cấu hình** đầy đủ theo spec: Tài khoản · Giao dịch · Train · Chức năng (vé vàng/NRJ, mua bùa…).
 - **Tab Nhật ký:** bảng trạng thái từng tài khoản (Đang chạy/Đã dừng/Lỗi + SM) và **log realtime**.
 - **Engine đa luồng:** mỗi tài khoản 1 luồng nền, dừng bằng `CancellationToken`, tôn trọng **giờ ON**,
-  **thoát khi đủ SM**. Nút **Bắt đầu/Dừng** đã nối thật.
+  **thoát khi đủ SM**. **Chạy/Dừng theo từng tài khoản** (nút ▶/⏹ mỗi dòng) hoặc **tất cả**.
 - **Lưu/đọc `config.json`**; **mật khẩu mã hóa DPAPI** (theo user Windows hiện tại), tương thích ngược file cũ.
 
 ## 5. Ghép game thật (việc còn lại)
@@ -62,4 +62,4 @@ Không cần sửa UI hay model — toàn bộ binding/log/trạng thái dùng l
 - Chưa build kiểm thử trên Windows trong môi trường tạo code (Linux) — hãy chạy `dotnet build` để xác nhận.
 
 ## 7. Hướng phát triển tiếp
-- `RealGameClient` theo protocol thật; import/export cấu hình; lọc log theo tài khoản; Start/Stop từng tài khoản riêng.
+- `RealGameClient` theo protocol thật; import/export cấu hình; lọc log theo tài khoản; thông báo Telegram/Discord.

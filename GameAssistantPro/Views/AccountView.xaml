@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Grid Margin="6">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="390"/>
+            <ColumnDefinition Width="480"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
@@ -19,10 +19,25 @@
                     <DataGrid.Columns>
                         <DataGridCheckBoxColumn Header="Bật"
                                                 Binding="{Binding Enabled, UpdateSourceTrigger=PropertyChanged}"
-                                                Width="46"/>
+                                                Width="40"/>
                         <DataGridTextColumn Header="Tên đăng nhập" Binding="{Binding Username}" Width="*"/>
-                        <DataGridTextColumn Header="Server" Binding="{Binding Server}" Width="70"/>
-                        <DataGridTextColumn Header="Trạng thái" Binding="{Binding RuntimeStatus}" Width="100" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Server" Binding="{Binding Server}" Width="60"/>
+                        <DataGridTextColumn Header="Trạng thái" Binding="{Binding RuntimeStatus}" Width="95" IsReadOnly="True"/>
+                        <DataGridTemplateColumn Header="Điều khiển" Width="110">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Button Content="▶" ToolTip="Chạy tài khoản này" Padding="9,2" Margin="2"
+                                                Command="{Binding DataContext.StartAccountCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                CommandParameter="{Binding}"/>
+                                        <Button Content="⏹" ToolTip="Dừng tài khoản này" Padding="9,2" Margin="2"
+                                                Background="{StaticResource HeaderBackground}"
+                                                Command="{Binding DataContext.StopAccountCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                CommandParameter="{Binding}"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
                     </DataGrid.Columns>
                 </DataGrid>
             </DockPanel>

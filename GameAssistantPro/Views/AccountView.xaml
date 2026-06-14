@@ -1,0 +1,129 @@
+<UserControl x:Class="GameAssistantPro.Views.AccountView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid Margin="6">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="390"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- LEFT: danh sách tài khoản -->
+        <GroupBox Header="Danh sách tài khoản" Grid.Column="0">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="➕  Thêm" Command="{Binding AddCommand}"/>
+                    <Button Content="🗑  Xóa" Command="{Binding DeleteCommand}"
+                            Background="{StaticResource HeaderBackground}"/>
+                </StackPanel>
+                <DataGrid ItemsSource="{Binding Accounts}" SelectedItem="{Binding SelectedAccount}">
+                    <DataGrid.Columns>
+                        <DataGridCheckBoxColumn Header="Bật"
+                                                Binding="{Binding Enabled, UpdateSourceTrigger=PropertyChanged}"
+                                                Width="46"/>
+                        <DataGridTextColumn Header="Tên đăng nhập" Binding="{Binding Username}" Width="*"/>
+                        <DataGridTextColumn Header="Server" Binding="{Binding Server}" Width="90"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </DockPanel>
+        </GroupBox>
+
+        <!-- RIGHT: form cấu hình -->
+        <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+
+                <GroupBox Header="Cấu hình tài khoản (chọn 1 dòng bên trái để sửa)">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="160"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Tên người dùng"/>
+                        <TextBox   Grid.Row="0" Grid.Column="1"
+                                   Text="{Binding SelectedAccount.Username, UpdateSourceTrigger=PropertyChanged}"/>
+
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Mật khẩu"/>
+                        <TextBox   Grid.Row="1" Grid.Column="1"
+                                   Text="{Binding SelectedAccount.Password, UpdateSourceTrigger=PropertyChanged}"/>
+
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Server"/>
+                        <TextBox   Grid.Row="2" Grid.Column="1"
+                                   Text="{Binding SelectedAccount.Server, UpdateSourceTrigger=PropertyChanged}"/>
+
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Máy chủ ủy quyền"/>
+                        <CheckBox  Grid.Row="3" Grid.Column="1" Content="Sử dụng proxy cho tài khoản này"
+                                   IsChecked="{Binding SelectedAccount.UseProxy}"/>
+
+                        <TextBlock Grid.Row="4" Grid.Column="0" Text="Proxy host"/>
+                        <TextBox   Grid.Row="4" Grid.Column="1" IsEnabled="{Binding SelectedAccount.UseProxy}"
+                                   Text="{Binding SelectedAccount.ProxyHost, UpdateSourceTrigger=PropertyChanged}"/>
+
+                        <TextBlock Grid.Row="5" Grid.Column="0" Text="Proxy port"/>
+                        <TextBox   Grid.Row="5" Grid.Column="1" IsEnabled="{Binding SelectedAccount.UseProxy}"
+                                   Text="{Binding SelectedAccount.ProxyPort, UpdateSourceTrigger=PropertyChanged}"/>
+
+                        <TextBlock Grid.Row="6" Grid.Column="0" Text="Proxy user"/>
+                        <TextBox   Grid.Row="6" Grid.Column="1" IsEnabled="{Binding SelectedAccount.UseProxy}"
+                                   Text="{Binding SelectedAccount.ProxyUser, UpdateSourceTrigger=PropertyChanged}"/>
+
+                        <TextBlock Grid.Row="7" Grid.Column="0" Text="Proxy pass"/>
+                        <TextBox   Grid.Row="7" Grid.Column="1" IsEnabled="{Binding SelectedAccount.UseProxy}"
+                                   Text="{Binding SelectedAccount.ProxyPass, UpdateSourceTrigger=PropertyChanged}"/>
+
+                        <TextBlock Grid.Row="8" Grid.Column="0" Text="Captcha"/>
+                        <StackPanel Grid.Row="8" Grid.Column="1" Orientation="Horizontal">
+                            <Border Width="130" Height="40" Background="{StaticResource InputBackground}"
+                                    BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="4">
+                                <TextBlock Text="[ảnh captcha]" Foreground="{StaticResource SubTextBrush}"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <TextBox Width="140" Margin="8,3,3,3"
+                                     Text="{Binding Captcha, UpdateSourceTrigger=PropertyChanged}"/>
+                        </StackPanel>
+                    </Grid>
+                </GroupBox>
+
+                <GroupBox Header="Mở game">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="160"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Kích thước (rộng)"/>
+                        <TextBox   Grid.Row="0" Grid.Column="1" Width="120" HorizontalAlignment="Left"
+                                   Text="{Binding Launch.GameWidth, UpdateSourceTrigger=PropertyChanged}"/>
+
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Kích thước (cao)"/>
+                        <TextBox   Grid.Row="1" Grid.Column="1" Width="120" HorizontalAlignment="Left"
+                                   Text="{Binding Launch.GameHeight, UpdateSourceTrigger=PropertyChanged}"/>
+
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Độ trễ mở game (ms)"/>
+                        <TextBox   Grid.Row="2" Grid.Column="1" Width="120" HorizontalAlignment="Left"
+                                   Text="{Binding Launch.OpenGameDelayMs, UpdateSourceTrigger=PropertyChanged}"/>
+                    </Grid>
+                </GroupBox>
+
+                <Button Content="💾  Save config" HorizontalAlignment="Left" Margin="9,6" Padding="16,8"
+                        Command="{Binding DataContext.SaveConfigCommand, RelativeSource={RelativeSource AncestorType=Window}}"/>
+
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

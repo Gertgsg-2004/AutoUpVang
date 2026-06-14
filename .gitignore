@@ -1,0 +1,20 @@
+# Build output
+bin/
+obj/
+out/
+
+# Visual Studio / Rider
+.vs/
+.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Config sinh ra khi chạy (không commit)
+config.json
+*.local.json
+
+# OS
+Thumbs.db
+.DS_Store

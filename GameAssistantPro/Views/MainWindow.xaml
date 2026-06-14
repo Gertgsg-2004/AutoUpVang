@@ -1,0 +1,64 @@
+<Window x:Class="GameAssistantPro.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:views="clr-namespace:GameAssistantPro.Views"
+        Title="Game Assistant Pro" Height="780" Width="1200"
+        MinHeight="600" MinWidth="980"
+        Background="{StaticResource AppBackground}"
+        WindowStartupLocation="CenterScreen">
+    <DockPanel>
+
+        <!-- Header / toolbar -->
+        <Border DockPanel.Dock="Top" Background="{StaticResource PanelBackground}" Padding="16,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="🐉 Game Assistant Pro" FontSize="20" FontWeight="Bold"
+                               Foreground="{StaticResource AccentTextBrush}"/>
+                    <TextBlock Text="v1.0" Margin="10,0,0,0" Foreground="{StaticResource SubTextBrush}"
+                               VerticalAlignment="Bottom"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Button Content="▶  Bắt đầu" Command="{Binding StartCommand}"/>
+                    <Button Content="⏹  Dừng" Command="{Binding StopCommand}"/>
+                    <Button Content="💾  Lưu cấu hình" Command="{Binding SaveConfigCommand}"/>
+                    <Button Content="↻  Tải lại" Command="{Binding ReloadConfigCommand}"
+                            Background="{StaticResource HeaderBackground}"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Status bar -->
+        <Border DockPanel.Dock="Bottom" Background="{StaticResource PanelBackground}" Padding="16,6">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="{Binding StatusMessage}" Foreground="{StaticResource SubTextBrush}"/>
+                <TextBlock Grid.Column="1" Text="{Binding ConfigPath}" Foreground="{StaticResource SubTextBrush}"
+                           FontSize="11" TextTrimming="CharacterEllipsis" MaxWidth="600"/>
+            </Grid>
+        </Border>
+
+        <!-- Tabs -->
+        <TabControl Background="Transparent" BorderThickness="0" Padding="0,8,0,0" Margin="8">
+            <TabItem Header="Tài khoản">
+                <views:AccountView DataContext="{Binding Account}"/>
+            </TabItem>
+            <TabItem Header="Giao dịch">
+                <views:TradeView DataContext="{Binding Trade}"/>
+            </TabItem>
+            <TabItem Header="Train">
+                <views:TrainView DataContext="{Binding Train}"/>
+            </TabItem>
+            <TabItem Header="Chức năng">
+                <views:FunctionView DataContext="{Binding Function}"/>
+            </TabItem>
+        </TabControl>
+
+    </DockPanel>
+</Window>

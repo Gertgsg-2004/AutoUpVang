@@ -1,0 +1,227 @@
+<UserControl x:Class="GameAssistantPro.Views.TrainView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid Margin="6">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- ===== ĐÁNH QUÁI ===== -->
+            <GroupBox Header="Đánh quái" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
+                <StackPanel>
+                    <WrapPanel>
+                        <TextBlock Text="Bản đồ:" Margin="3"/>
+                        <TextBox Width="70" Text="{Binding Config.Map, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Text="Khu:" Margin="16,3,3,3"/>
+                        <TextBox Width="70" Text="{Binding Config.Zone, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Text="Giới hạn HP %:" Margin="16,3,3,3"/>
+                        <TextBox Width="60" Text="{Binding Config.HpLimitPercent, UpdateSourceTrigger=PropertyChanged}"/>
+                        <CheckBox Content="Hiển thị FPS" Margin="20,3,3,3" IsChecked="{Binding Config.ShowFps}"/>
+                    </WrapPanel>
+
+                    <WrapPanel>
+                        <TextBlock Text="Cơ chế đánh dấu:" Margin="3" FontWeight="SemiBold"/>
+                        <RadioButton GroupName="Mark" Content="Use TDLT"
+                                     IsChecked="{Binding Config.MarkMode, Converter={StaticResource EnumBool}, ConverterParameter=UseTdlt}"/>
+                        <RadioButton GroupName="Mark" Content="Tàn sát"
+                                     IsChecked="{Binding Config.MarkMode, Converter={StaticResource EnumBool}, ConverterParameter=TanSat}"/>
+                        <RadioButton GroupName="Mark" Content="Kích hoạt cờ"
+                                     IsChecked="{Binding Config.MarkMode, Converter={StaticResource EnumBool}, ConverterParameter=KichHoatCo}"/>
+                    </WrapPanel>
+
+                    <WrapPanel>
+                        <TextBlock Text="Loại quái:" Margin="3" FontWeight="SemiBold"/>
+                        <RadioButton GroupName="Select" Content="Tất cả"
+                                     IsChecked="{Binding Config.SelectMode, Converter={StaticResource EnumBool}, ConverterParameter=AllAll}"/>
+                        <RadioButton GroupName="Select" Content="Theo vị trí"
+                                     IsChecked="{Binding Config.SelectMode, Converter={StaticResource EnumBool}, ConverterParameter=ByPosition}"/>
+                        <RadioButton GroupName="Select" Content="Theo ID"
+                                     IsChecked="{Binding Config.SelectMode, Converter={StaticResource EnumBool}, ConverterParameter=ById}"/>
+                        <TextBlock Text="     Lọc quái:" Margin="3" FontWeight="SemiBold"/>
+                        <RadioButton GroupName="Filter" Content="Tất cả"
+                                     IsChecked="{Binding Config.Filter, Converter={StaticResource EnumBool}, ConverterParameter=All}"/>
+                        <RadioButton GroupName="Filter" Content="Chỉ quái thường"
+                                     IsChecked="{Binding Config.Filter, Converter={StaticResource EnumBool}, ConverterParameter=OnlyNormal}"/>
+                        <RadioButton GroupName="Filter" Content="Chỉ siêu quái"
+                                     IsChecked="{Binding Config.Filter, Converter={StaticResource EnumBool}, ConverterParameter=OnlySuper}"/>
+                    </WrapPanel>
+
+                    <Grid Margin="0,6,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Danh sách quái -->
+                        <DockPanel Grid.Column="0">
+                            <TextBlock DockPanel.Dock="Top" Text="Danh sách quái"
+                                       Foreground="{StaticResource AccentTextBrush}" Margin="3"/>
+                            <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal">
+                                <Button Content="➕  Thêm quái" Command="{Binding AddMonsterCommand}"/>
+                                <Button Content="🗑  Xóa" Command="{Binding DeleteMonsterCommand}"
+                                        Background="{StaticResource HeaderBackground}"/>
+                            </StackPanel>
+                            <DataGrid Height="180" ItemsSource="{Binding Config.Monsters}"
+                                      SelectedItem="{Binding SelectedMonster}">
+                                <DataGrid.Columns>
+                                    <DataGridCheckBoxColumn Header="Bật"
+                                                            Binding="{Binding Enabled, UpdateSourceTrigger=PropertyChanged}" Width="46"/>
+                                    <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="70"/>
+                                    <DataGridTextColumn Header="Tên" Binding="{Binding Name}" Width="*"/>
+                                    <DataGridTextColumn Header="HP % riêng" Binding="{Binding HpLimitPercent}" Width="90"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </DockPanel>
+
+                        <!-- Danh sách kỹ năng -->
+                        <DockPanel Grid.Column="1">
+                            <TextBlock DockPanel.Dock="Top" Text="ID kỹ năng"
+                                       Foreground="{StaticResource AccentTextBrush}" Margin="3"/>
+                            <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal">
+                                <Button Content="➕  Thêm" Command="{Binding AddSkillCommand}"/>
+                                <Button Content="🗑  Xóa" Command="{Binding DeleteSkillCommand}"
+                                        Background="{StaticResource HeaderBackground}"/>
+                            </StackPanel>
+                            <DataGrid Height="180" ItemsSource="{Binding Config.Skills}"
+                                      SelectedItem="{Binding SelectedSkill}">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="ID kỹ năng" Binding="{Binding Id}" Width="*"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </DockPanel>
+                    </Grid>
+                </StackPanel>
+            </GroupBox>
+
+            <!-- ===== NHẶT / XỬ LÝ ĐỒ ===== -->
+            <GroupBox Header="Nhặt / xử lý đồ" Grid.Row="1" Grid.Column="0">
+                <StackPanel>
+                    <WrapPanel>
+                        <TextBlock Text="Cơ chế:" Margin="3" FontWeight="SemiBold"/>
+                        <RadioButton GroupName="Pickup" Content="Tất cả"
+                                     IsChecked="{Binding Config.Pickup.Mode, Converter={StaticResource EnumBool}, ConverterParameter=All}"/>
+                        <RadioButton GroupName="Pickup" Content="Theo ID"
+                                     IsChecked="{Binding Config.Pickup.Mode, Converter={StaticResource EnumBool}, ConverterParameter=ById}"/>
+                        <RadioButton GroupName="Pickup" Content="Theo loại"
+                                     IsChecked="{Binding Config.Pickup.Mode, Converter={StaticResource EnumBool}, ConverterParameter=ByType}"/>
+                        <RadioButton GroupName="Pickup" Content="Loại trừ"
+                                     IsChecked="{Binding Config.Pickup.Mode, Converter={StaticResource EnumBool}, ConverterParameter=Exclude}"/>
+                    </WrapPanel>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Danh sách ID/loại để nhặt -->
+                        <DockPanel Grid.Column="0">
+                            <TextBlock DockPanel.Dock="Top" Text="Danh sách ID / loại"
+                                       Foreground="{StaticResource AccentTextBrush}" Margin="3"/>
+                            <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal">
+                                <Button Content="➕" Command="{Binding AddPickupCommand}"/>
+                                <Button Content="🗑" Command="{Binding DeletePickupCommand}"
+                                        Background="{StaticResource HeaderBackground}"/>
+                            </StackPanel>
+                            <DataGrid Height="150" ItemsSource="{Binding Config.Pickup.Items}"
+                                      SelectedItem="{Binding SelectedPickup}">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="ID / loại" Binding="{Binding Id}" Width="*"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </DockPanel>
+
+                        <!-- Danh sách vứt -->
+                        <DockPanel Grid.Column="1">
+                            <TextBlock DockPanel.Dock="Top" Text="Danh sách vứt"
+                                       Foreground="{StaticResource AccentTextBrush}" Margin="3"/>
+                            <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal">
+                                <Button Content="➕" Command="{Binding AddDropCommand}"/>
+                                <Button Content="🗑" Command="{Binding DeleteDropCommand}"
+                                        Background="{StaticResource HeaderBackground}"/>
+                            </StackPanel>
+                            <DataGrid Height="150" ItemsSource="{Binding Config.Pickup.DropList}"
+                                      SelectedItem="{Binding SelectedDrop}">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="ID đồ vứt" Binding="{Binding Id}" Width="*"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </DockPanel>
+                    </Grid>
+
+                    <WrapPanel>
+                        <CheckBox Content="Auto Vứt" IsChecked="{Binding Config.Pickup.AutoDrop}"/>
+                        <CheckBox Content="Auto Default" Margin="20,3,3,3" IsChecked="{Binding Config.Pickup.AutoDefault}"/>
+                    </WrapPanel>
+                </StackPanel>
+            </GroupBox>
+
+            <!-- ===== NÉ NGƯỜI / BOSS ===== -->
+            <GroupBox Header="Né người / Boss" Grid.Row="1" Grid.Column="1">
+                <StackPanel>
+                    <CheckBox Content="Kích hoạt né người / boss" IsChecked="{Binding Config.Avoid.Enabled}"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <DockPanel Grid.Column="0">
+                            <TextBlock DockPanel.Dock="Top" Text="Danh sách tên"
+                                       Foreground="{StaticResource AccentTextBrush}" Margin="3"/>
+                            <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal">
+                                <Button Content="➕" Command="{Binding AddAvoidNameCommand}"/>
+                                <Button Content="🗑" Command="{Binding DeleteAvoidNameCommand}"
+                                        Background="{StaticResource HeaderBackground}"/>
+                            </StackPanel>
+                            <DataGrid Height="150" ItemsSource="{Binding Config.Avoid.Names}"
+                                      SelectedItem="{Binding SelectedAvoidName}">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Tên" Binding="{Binding Name}" Width="*"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </DockPanel>
+
+                        <DockPanel Grid.Column="1">
+                            <TextBlock DockPanel.Dock="Top" Text="Danh sách khu"
+                                       Foreground="{StaticResource AccentTextBrush}" Margin="3"/>
+                            <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal">
+                                <Button Content="➕" Command="{Binding AddAvoidZoneCommand}"/>
+                                <Button Content="🗑" Command="{Binding DeleteAvoidZoneCommand}"
+                                        Background="{StaticResource HeaderBackground}"/>
+                            </StackPanel>
+                            <DataGrid Height="150" ItemsSource="{Binding Config.Avoid.Zones}"
+                                      SelectedItem="{Binding SelectedAvoidZone}">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Khu" Binding="{Binding Id}" Width="*"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </DockPanel>
+                    </Grid>
+                </StackPanel>
+            </GroupBox>
+
+            <!-- ===== CỘNG CHỈ SỐ ===== -->
+            <GroupBox Header="Cộng chỉ số" Grid.Row="2" Grid.Column="0">
+                <StackPanel>
+                    <CheckBox Content="Kích hoạt cộng chỉ số" IsChecked="{Binding Config.AddStats.Enabled}"/>
+                    <WrapPanel>
+                        <TextBlock Text="HP:" Margin="3"/>
+                        <TextBox Width="70" Text="{Binding Config.AddStats.Hp, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Text="MP:" Margin="16,3,3,3"/>
+                        <TextBox Width="70" Text="{Binding Config.AddStats.Mp, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Text="SD:" Margin="16,3,3,3"/>
+                        <TextBox Width="70" Text="{Binding Config.AddStats.Sd, UpdateSourceTrigger=PropertyChanged}"/>
+                    </WrapPanel>
+                </StackPanel>
+            </GroupBox>
+        </Grid>
+    </ScrollViewer>
+</UserControl>

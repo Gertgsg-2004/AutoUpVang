@@ -120,6 +120,9 @@
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
 
                         <TextBlock Grid.Row="0" Grid.Column="0" Text="Kích thước (rộng)"/>
@@ -133,6 +136,18 @@
                         <TextBlock Grid.Row="2" Grid.Column="0" Text="Độ trễ mở game (ms)"/>
                         <TextBox   Grid.Row="2" Grid.Column="1" Width="120" HorizontalAlignment="Left"
                                    Text="{Binding Launch.OpenGameDelayMs, UpdateSourceTrigger=PropertyChanged}"/>
+
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Kết nối game thật"/>
+                        <CheckBox  Grid.Row="3" Grid.Column="1" Content="Dùng RealGameClient (kết nối server thật)"
+                                   IsChecked="{Binding Launch.UseRealClient}"/>
+
+                        <TextBlock Grid.Row="4" Grid.Column="0" Text="Server host (IP)"/>
+                        <TextBox   Grid.Row="4" Grid.Column="1" Width="240" HorizontalAlignment="Left"
+                                   Text="{Binding Launch.ServerHost, UpdateSourceTrigger=PropertyChanged}"/>
+
+                        <TextBlock Grid.Row="5" Grid.Column="0" Text="Server port"/>
+                        <TextBox   Grid.Row="5" Grid.Column="1" Width="120" HorizontalAlignment="Left"
+                                   Text="{Binding Launch.ServerPort, UpdateSourceTrigger=PropertyChanged}"/>
                     </Grid>
                 </GroupBox>
 

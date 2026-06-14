@@ -81,9 +81,12 @@ public class MainViewModel : ObservableObject
     {
         _configService = configService;
 
-        // === ĐIỂM CẮM GAME THẬT ===
-        // Đổi "() => new SimulatedGameClient()" thành factory tạo client thật của bạn.
-        _manager = new BotManager(() => new SimulatedGameClient());
+        // Chọn engine theo cấu hình: kết nối thật (RealGameClient) hay mô phỏng (SimulatedGameClient).
+        // Bật/tắt ở tab Tài khoản > Mở game > "Kết nối game thật".
+        _manager = new BotManager(() =>
+            _config.Launch.UseRealClient
+                ? (IGameClient)new RealGameClient()
+                : new SimulatedGameClient());
         _manager.Log += OnRunnerLog;
         _manager.StateChanged += OnEngineStateChanged;
 

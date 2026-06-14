@@ -20,6 +20,31 @@ dotnet run --project GameAssistantPro/GameAssistantPro.csproj
 ```
 Hoặc mở `GameAssistantPro.sln` bằng Visual Studio → F5.
 
+## 2b. Đóng gói — giải nén chạy thẳng (không cần cài .NET)
+Tạo bản **self-contained, single-file** (giống mẫu *Train Basic V32*: 1 file `.exe` + vài DLL `*_cor3.dll`,
+giải nén là chạy ngay, máy đích **không cần cài .NET runtime**).
+
+**Cách 1 — script (khuyên dùng):**
+```bat
+publish.bat            :: 64-bit (win-x64)
+publish.bat win-x86    :: 32-bit
+```
+Kết quả:
+- Thư mục chạy trực tiếp: `publish\GameAssistantPro\GameAssistantPro.exe`
+- File nén để chia sẻ: `GameAssistantPro-win-x64.zip` → người khác **giải nén → bấm `.exe` là chạy**.
+
+**Cách 2 — Visual Studio:** chuột phải project **GameAssistantPro → Publish** → chọn profile **win-x64**.
+
+**Cách 3 — CLI thủ công:**
+```bat
+dotnet publish GameAssistantPro\GameAssistantPro.csproj -c Release -r win-x64 --self-contained true ^
+  -p:PublishSingleFile=true -p:EnableCompressionInSingleFile=true -o publish\GameAssistantPro
+```
+Ghi chú:
+- File `config.json` sẽ nằm **cạnh `.exe`** khi chạy (mật khẩu đã mã hóa DPAPI).
+- Bản self-contained khá nặng (~70–100 MB) vì gói sẵn runtime — đổi lại không cần cài .NET.
+- Muốn đổi tên file `.exe`: sửa `<AssemblyName>` trong `GameAssistantPro.csproj`.
+
 ## 3. Cấu trúc dự án (MVVM)
 ```
 GameAssistantPro/

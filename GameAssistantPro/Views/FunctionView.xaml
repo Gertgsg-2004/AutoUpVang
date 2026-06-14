@@ -67,6 +67,14 @@
                         <TextBox Width="70" Text="{Binding Config.OnTimeEnd, UpdateSourceTrigger=PropertyChanged}"/>
                         <TextBlock Text="(định dạng HH:mm)" Foreground="{StaticResource SubTextBrush}" Margin="8,3,3,3"/>
                     </WrapPanel>
+
+                    <WrapPanel>
+                        <CheckBox Content="Tự khởi động lại khi lỗi" IsChecked="{Binding Config.AutoRestart}"/>
+                        <TextBlock Text="Chờ (s):" Margin="16,3,3,3"/>
+                        <TextBox Width="60" Text="{Binding Config.RestartDelaySeconds, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Text="Số lần (0=∞):" Margin="16,3,3,3"/>
+                        <TextBox Width="60" Text="{Binding Config.MaxRestarts, UpdateSourceTrigger=PropertyChanged}"/>
+                    </WrapPanel>
                 </StackPanel>
             </GroupBox>
 

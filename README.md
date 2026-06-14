@@ -44,6 +44,8 @@ GameAssistantPro/
 - **Tab Nhật ký:** bảng trạng thái từng tài khoản (Đang chạy/Đã dừng/Lỗi + SM) và **log realtime**.
 - **Engine đa luồng:** mỗi tài khoản 1 luồng nền, dừng bằng `CancellationToken`, tôn trọng **giờ ON**,
   **thoát khi đủ SM**. **Chạy/Dừng theo từng tài khoản** (nút ▶/⏹ mỗi dòng) hoặc **tất cả**.
+- **Ổn định & theo dõi:** **tự khởi động lại khi lỗi** (backoff theo số lần thử); **thống kê** mỗi tài khoản
+  (SM/giờ, số vòng, số lỗi, thời gian chạy); **lọc log theo tài khoản** và **xuất log ra file**.
 - **Lưu/đọc `config.json`**; **mật khẩu mã hóa DPAPI** (theo user Windows hiện tại), tương thích ngược file cũ.
 
 ## 5. Ghép game thật (việc còn lại)

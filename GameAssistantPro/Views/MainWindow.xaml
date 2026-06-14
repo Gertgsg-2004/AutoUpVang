@@ -70,9 +70,13 @@
                         <DataGrid ItemsSource="{Binding Runners}" Height="150" IsReadOnly="True">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Tài khoản" Binding="{Binding Account.Username}" Width="*"/>
-                                <DataGridTextColumn Header="Trạng thái" Binding="{Binding StatusText}" Width="140"/>
-                                <DataGridTextColumn Header="SM" Binding="{Binding Account.RuntimePower, StringFormat=N0}" Width="160"/>
-                                <DataGridTemplateColumn Header="Điều khiển" Width="170">
+                                <DataGridTextColumn Header="Trạng thái" Binding="{Binding StatusText}" Width="110"/>
+                                <DataGridTextColumn Header="SM" Binding="{Binding Account.RuntimePower, StringFormat=N0}" Width="120"/>
+                                <DataGridTextColumn Header="SM/giờ" Binding="{Binding SmPerHour, StringFormat=N0}" Width="100"/>
+                                <DataGridTextColumn Header="Vòng" Binding="{Binding LoopCount}" Width="55"/>
+                                <DataGridTextColumn Header="Lỗi" Binding="{Binding ErrorCount}" Width="45"/>
+                                <DataGridTextColumn Header="Thời gian" Binding="{Binding UptimeText}" Width="85"/>
+                                <DataGridTemplateColumn Header="Điều khiển" Width="150">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <StackPanel Orientation="Horizontal">
@@ -92,12 +96,15 @@
                     </GroupBox>
 
                     <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="6,4">
-                        <TextBlock Text="Nhật ký hoạt động" Foreground="{StaticResource AccentTextBrush}" FontWeight="SemiBold"/>
-                        <Button Content="🧹  Xóa log" Margin="16,0,0,0" Command="{Binding ClearLogsCommand}"
+                        <TextBlock Text="Nhật ký" Foreground="{StaticResource AccentTextBrush}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        <TextBlock Text="Lọc theo TK:" Margin="16,0,4,0" VerticalAlignment="Center"/>
+                        <ComboBox Width="180" ItemsSource="{Binding AccountFilters}" SelectedItem="{Binding AccountFilter}"/>
+                        <Button Content="📤  Xuất log" Margin="12,0,0,0" Command="{Binding ExportLogsCommand}"/>
+                        <Button Content="🧹  Xóa log" Command="{Binding ClearLogsCommand}"
                                 Background="{StaticResource HeaderBackground}"/>
                     </StackPanel>
 
-                    <ListBox Grid.Row="2" ItemsSource="{Binding Logs}" Margin="6"
+                    <ListBox Grid.Row="2" ItemsSource="{Binding LogsView}" DisplayMemberPath="Display" Margin="6"
                              Background="{StaticResource InputBackground}" Foreground="{StaticResource TextBrush}"
                              BorderBrush="{StaticResource LineBrush}" BorderThickness="1"
                              FontFamily="Consolas" FontSize="12"/>

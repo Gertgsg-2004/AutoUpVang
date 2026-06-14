@@ -109,6 +109,9 @@ public class FunctionConfig : ObservableObject
     private bool _buyGoldIngot;
     private string _onTimeStart = "00:00";
     private string _onTimeEnd = "23:59";
+    private bool _autoRestart;
+    private int _restartDelaySeconds = 10;
+    private int _maxRestarts;
 
     /// <summary>Thoát khi đủ SM (sức mạnh).</summary>
     public bool ExitWhenEnoughSm { get => _exitWhenEnoughSm; set => SetProperty(ref _exitWhenEnoughSm, value); }
@@ -157,6 +160,15 @@ public class FunctionConfig : ObservableObject
 
     /// <summary>Thời gian ON (giờ kết thúc), định dạng HH:mm.</summary>
     public string OnTimeEnd { get => _onTimeEnd; set => SetProperty(ref _onTimeEnd, value); }
+
+    /// <summary>Tự khởi động lại khi gặp lỗi / rớt mạng.</summary>
+    public bool AutoRestart { get => _autoRestart; set => SetProperty(ref _autoRestart, value); }
+
+    /// <summary>Thời gian chờ cơ sở giữa các lần thử lại (giây). Backoff = giây × lần thử.</summary>
+    public int RestartDelaySeconds { get => _restartDelaySeconds; set => SetProperty(ref _restartDelaySeconds, value); }
+
+    /// <summary>Số lần thử lại tối đa (0 = không giới hạn).</summary>
+    public int MaxRestarts { get => _maxRestarts; set => SetProperty(ref _maxRestarts, value); }
 
     /// <summary>Cấu hình vé vàng / NRJ.</summary>
     public GoldTicketConfig GoldTicket { get; set; } = new();

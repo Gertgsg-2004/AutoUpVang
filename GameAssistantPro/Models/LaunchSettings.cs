@@ -11,6 +11,7 @@ public class LaunchSettings : ObservableObject
     private bool _useRealClient;
     private string _serverHost = "";
     private int _serverPort;
+    private string _clientVersion = "2.3.0";
 
     /// <summary>Chiều rộng cửa sổ game.</summary>
     public int GameWidth { get => _gameWidth; set => SetProperty(ref _gameWidth, value); }
@@ -29,4 +30,7 @@ public class LaunchSettings : ObservableObject
 
     /// <summary>Cổng server game.</summary>
     public int ServerPort { get => _serverPort; set => SetProperty(ref _serverPort, value); }
+
+    /// <summary>Phiên bản client gửi khi đăng nhập (vd 2.3.0).</summary>
+    public string ClientVersion { get => _clientVersion; set => SetProperty(ref _clientVersion, value); }
 }

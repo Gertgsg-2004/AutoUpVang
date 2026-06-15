@@ -123,6 +123,7 @@
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
 
                         <TextBlock Grid.Row="0" Grid.Column="0" Text="Kích thước (rộng)"/>
@@ -148,6 +149,10 @@
                         <TextBlock Grid.Row="5" Grid.Column="0" Text="Server port"/>
                         <TextBox   Grid.Row="5" Grid.Column="1" Width="120" HorizontalAlignment="Left"
                                    Text="{Binding Launch.ServerPort, UpdateSourceTrigger=PropertyChanged}"/>
+
+                        <TextBlock Grid.Row="6" Grid.Column="0" Text="Phiên bản client"/>
+                        <TextBox   Grid.Row="6" Grid.Column="1" Width="120" HorizontalAlignment="Left"
+                                   Text="{Binding Launch.ClientVersion, UpdateSourceTrigger=PropertyChanged}"/>
                     </Grid>
                 </GroupBox>
 

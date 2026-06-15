@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
@@ -6,15 +7,17 @@ using System.Threading.Tasks;
 namespace GameAssistantPro.Engine.Net;
 
 /// <summary>
-/// Phiên kết nối TCP + đọc/ghi message theo khung [command][length:2][data].
-/// Có cơ chế mã hóa luồng XOR-key (kiểu mService/TeaMobi): sau khi <see cref="SetKey"/>,
-/// mọi byte gửi/nhận được XOR với key theo chỉ số quay vòng.
-///
-/// LƯU Ý: khung gói + cơ chế key này theo MẪU CHUNG của game TeaMobi. Nếu NRO khác
-/// (độ dài length, thứ tự, cách trao key...) thì chỉnh tại đây cho khớp.
+/// Phiên kết nối TCP + đọc/ghi message theo giao thức TeaMobi/NRO.
+/// Khung gói thường: [command:1][length:2 big-endian][data].
+/// Gói "lớn" (command thuộc <see cref="BigCommands"/>): [command:1][length:3][data].
+/// Sau khi <see cref="SetKey"/>: mọi byte gửi/nhận XOR với key theo chỉ số quay vòng.
+/// (Port từ Session client NRO mã nguồn mở.)
 /// </summary>
 public sealed class Session : IDisposable
 {
+    // Các command dùng độ dài 3 byte (port y theo client gốc).
+    private static readonly sbyte[] BigCommands = { -32, -66, 11, -67, -74, -87, 66 };
+
     private TcpClient? _client;
     private NetworkStream? _stream;
     private byte[]? _key;
@@ -35,7 +38,7 @@ public sealed class Session : IDisposable
         _ = Task.Run(() => ReadLoopAsync(_readCts.Token));
     }
 
-    /// <summary>Đặt key mã hóa luồng (gọi sau khi nhận message chứa key từ server).</summary>
+    /// <summary>Đặt key mã hóa luồng (gọi sau khi nhận message key từ server).</summary>
     public void SetKey(byte[] key)
     {
         _key = key;
@@ -68,10 +71,22 @@ public sealed class Session : IDisposable
         {
             while (!ct.IsCancellationRequested && _stream is not null)
             {
-                int command = ReadKey(await ReadRawByteAsync(ct));
-                int hi = ReadKey(await ReadRawByteAsync(ct));
-                int lo = ReadKey(await ReadRawByteAsync(ct));
-                int length = (hi << 8) | lo;
+                var command = (sbyte)ReadKey(await ReadRawByteAsync(ct));
+
+                int length;
+                if (Array.IndexOf(BigCommands, command) >= 0)
+                {
+                    int n1 = (sbyte)ReadKey(await ReadRawByteAsync(ct)) + 128;
+                    int n2 = (sbyte)ReadKey(await ReadRawByteAsync(ct)) + 128;
+                    int n3 = (sbyte)ReadKey(await ReadRawByteAsync(ct)) + 128;
+                    length = (n3 * 256 + n2) * 256 + n1;
+                }
+                else
+                {
+                    int hi = ReadKey(await ReadRawByteAsync(ct));
+                    int lo = ReadKey(await ReadRawByteAsync(ct));
+                    length = (hi << 8) | lo;
+                }
 
                 var data = new byte[length];
                 int off = 0;
@@ -86,7 +101,7 @@ public sealed class Session : IDisposable
                     for (int i = 0; i < length; i++)
                         data[i] = ReadKey(data[i]);
 
-                MessageReceived?.Invoke(new Message((sbyte)command, data));
+                MessageReceived?.Invoke(new Message(command, data));
             }
         }
         catch (OperationCanceledException)
